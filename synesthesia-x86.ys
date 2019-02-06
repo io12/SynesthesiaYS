@@ -3953,7 +3953,7 @@
         ; First byte odd
         ; (= 0b1 (bv-extract 0 0 (get-byte 0x00)))
         ; Strictly increasing
-        (=> (bv-lt idx (bv-sub finaleip 0x01)) (bv-lt (get-byte idx) (get-byte (bv-add idx 0x01)))
+        ; (=> (bv-lt idx (bv-sub finaleip 0x01)) (bv-lt (get-byte idx) (get-byte (bv-add idx 0x01)))
 
           ; First two bytes of each instruction are less than 0x20
           ; (bv-lt (get-byte eip0) 0x20)
@@ -3964,7 +3964,7 @@
           ; (bv-lt (get-byte (bv-add eip2 0x01)) 0x20)
         ;(=> (bv-lt idx finaleip) (bv-le (get-byte idx) 0x20))
         ;(/= (get-byte idx) 0x00)
-      ) ; end and
+      ; ) ; end and
     )))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))) ; end let * 12
   ) ; end forall
 ) ; end assert
