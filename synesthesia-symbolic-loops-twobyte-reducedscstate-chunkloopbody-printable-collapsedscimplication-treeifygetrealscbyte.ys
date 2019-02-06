@@ -22,7 +22,7 @@
 (define-type Reg32State          (bitvector 256))
 (define-type SCDoubleState       (bitvector 16)) ; 0x40-length shellcode, two-byte encoding
 (define-type SCState             (bitvector 8)) ; 0x40-length shellcode, two-byte encoding
-	
+
 (define-type Mnem               (bitvector    4))
 (define XorRegReg   ::Mnem (mk-bv 4 0))
 (define AddRegReg   ::Mnem (mk-bv 4 1))
@@ -48,7 +48,7 @@
 ;  43 43: Bit [is-jcc]
 ;  51 44: Byte [length]
 ;  59 52: Byte [nexteip]
-	
+
 (define di-get-insn::(-> DecodedInstruction Instruction)
   (lambda (di::DecodedInstruction)
     (bv-extract 41 0 di)
@@ -148,7 +148,7 @@
 
 (define-type RegAndSCState             (bitvector 272))
 
-(define-type SecondaryMachineState     (bitvector 296)) 
+(define-type SecondaryMachineState     (bitvector 296))
 ;  255    0: Reg32State
 ;  271  256: SCDoubleState
 ;  279  272: Byte [scinptr]
@@ -225,7 +225,7 @@
   (lambda (sc::SCDoubleState idx::Byte)
     (ite (= (bv-extract 0 0 idx) 0b0) (bv-extract 7 0 sc) (bv-extract 15 8 sc))
   )
-)	
+)
 
 (define sms-getscbyte-byidx::(-> SecondaryMachineState Byte Byte)
   (lambda (mstate::SecondaryMachineState idx::Byte)
@@ -245,8 +245,8 @@
   (lambda (mstate::SecondaryMachineState b::Byte)
     (let ((sc (sms-getscstate mstate)))
     (let ((scptr (sms-getscoutptr mstate)))
-    (let ((newsc 
-      (ite (= 0b0 (bv-extract 0 0 scptr)) 
+    (let ((newsc
+      (ite (= 0b0 (bv-extract 0 0 scptr))
         (bv-concat (bv-extract 15 8 sc) b)
         (bv-concat b (bv-extract 7 0 sc)))))
     (bv-concat (sms-getnexteip mstate) (bv-add scptr 0x01) (sms-getscinptr mstate) newsc (sms-getregstate mstate))
@@ -402,7 +402,7 @@
 
 ; Used instead of an array lookup. Pass in byte XX, get back the bytecodeXX
 ; variable.
-(define get-byte::(-> Byte Byte) 
+(define get-byte::(-> Byte Byte)
 	(lambda (x::Byte)
     (ite (= x 0x00) bytecode00
     (ite (= x 0x01) bytecode01
@@ -797,7 +797,7 @@
 (define realscbyte3D::Byte 0x1F)
 (define realscbyte3E::Byte 0xAD)
 (define realscbyte3F::Byte 0x05)
-	
+
 ;(define realsc::SCState (bv-concat realscbyte3F realscbyte3E realscbyte3D realscbyte3C realscbyte3B realscbyte3A realscbyte39 realscbyte38 realscbyte37 realscbyte36 realscbyte35 realscbyte34 realscbyte33 realscbyte32 realscbyte31 realscbyte30 realscbyte2F realscbyte2E realscbyte2D realscbyte2C realscbyte2B realscbyte2A realscbyte29 realscbyte28 realscbyte27 realscbyte26 realscbyte25 realscbyte24 realscbyte23 realscbyte22 realscbyte21 realscbyte20 realscbyte1F realscbyte1E realscbyte1D realscbyte1C realscbyte1B realscbyte1A realscbyte19 realscbyte18 realscbyte17 realscbyte16 realscbyte15 realscbyte14 realscbyte13 realscbyte12 realscbyte11 realscbyte10 realscbyte0F realscbyte0E realscbyte0D realscbyte0C realscbyte0B realscbyte0A realscbyte09 realscbyte08 realscbyte07 realscbyte06 realscbyte05 realscbyte04 realscbyte03 realscbyte02 realscbyte01 realscbyte00))
 
 (define getrealscbyte::(-> Byte Byte)
@@ -865,14 +865,14 @@
       (ite (= idx 0x3C) realscbyte3C
       (ite (= idx 0x3D) realscbyte3D
       (ite (= idx 0x3E) realscbyte3E
-                        realscbyte3F  
+                        realscbyte3F
       ))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
   ))
 )
 
 ; Used instead of an array lookup. Pass in byte XX, get back the bytecodeXX
 ; variable.
-(define getencscbyte::(-> Byte Byte) 
+(define getencscbyte::(-> Byte Byte)
 	(lambda (x::Byte)
     (ite (bv-lt x 0x40)
       (ite (bv-lt x 0x20)
@@ -1133,7 +1133,7 @@
         )))))))))))))))
     ))))))))))
   )
-) 
+)
 
 (define simulate-insn::(-> Instruction Byte Byte SecondaryMachineState SecondaryMachineState)
 	(lambda (insn::Instruction nexteip::Byte desteip::Byte sms::SecondaryMachineState)
@@ -1225,7 +1225,7 @@
     (= Ins9 (di-get-insn DIC9))
 
     (= EipA (bv-add Eip9 Len9))
-    
+
     (di-get-extra DIC0)
     (di-get-extra DIC1)
     (di-get-extra DIC2)
@@ -1241,7 +1241,7 @@
 
 ; Program shape: last instruction is Jnz to Eip1
 (assert
-  (and 
+  (and
     (not (di-is-jcc DIC0))
     (not (di-is-jcc DIC1))
     (not (di-is-jcc DIC2))
@@ -1254,7 +1254,7 @@
     (and (di-is-jcc DIC9) (= EipLoopBeg (di-get-next DIC9)))
   )
 )
- 
+
 ; Loop
 (assert
   (forall (r0::Dword r1::Dword r2::Dword r3::Dword r4::Dword r5::Dword r6::Dword r7::Dword scinptr::Byte sclow::Byte schigh::Byte)
@@ -1282,24 +1282,24 @@
     (let ((sclengthlow  (bv-extract 7 0 sclength)))
     (let ((sclengthdlow (bv-extract 7 0 sclengthd)))
 
-    (and 
+    (and
       ; INITIALIZATION BLOCK
       ; Some register contains the size of the shellcode
       (= (sms-getreg32 WhichReg state1) sclength)
-      
+
       ; DECODE BLOCK
       ; The shellcode input pointer has increased by two, AND
       (= (sms-getscinptr finaldecodestate) (bv-add scinptr 0x02))
       (= (sms-getscoutptr finaldecodestate) (sms-getscoutptr begindecodestate))
       (= (sms-getreg32 WhichReg finaldecodestate) (sms-getreg32 WhichReg begindecodestate))
       (= (sms-getscstate finaldecodestate) (sms-getscstate begindecodestate))
-      
+
       ; STORE BLOCK
       ; The shellcode output pointer has increased by one, AND
       (= (sms-getscoutptr finalstorestate) (bv-add scoutptr 0x01))
       (= (sms-getscinptr finalstorestate) (sms-getscinptr beginstorestate))
       (= (sms-getreg32 WhichReg finaldecodestate) (sms-getreg32 WhichReg begindecodestate))
-      
+
       ; DECREMENT BLOCK
       ; The counter register has decreased by one, AND
       (= (bv-add (sms-getreg32 WhichReg finaldecstate) 0x00000001) (sms-getreg32 WhichReg begindecstate))
@@ -1312,8 +1312,8 @@
       (= (sms-getnexteip finalloopstate) (ite (= 0x00000000 (sms-getreg32 WhichReg finalloopstate)) EipLoopEnd EipLoopBeg))
 
       ; DECODER LOGIC
-      (=> 
-        (and 
+      (=>
+        (and
           (= 0b0 (bv-extract 0 0 scinptr))
           (bv-lt scinptr  sclengthdlow)
           (= sclow  (getencscbyte scinptr))
@@ -1321,13 +1321,13 @@
         )
         (and
           (= (sms-getscbyte-byidx finalstorestate scoutptr) (getrealscbyte scoutptr))
-          (and (bv-le 0x20 sclow)  (bv-le sclow 0x7F)) 
-          (and (bv-le 0x20 schigh) (bv-le schigh 0x7F)) 
+          (and (bv-le 0x20 sclow)  (bv-le sclow 0x7F))
+          (and (bv-le 0x20 schigh) (bv-le schigh 0x7F))
         )
       )
-      
-      
-      
+
+
+
       ; ; THIS MIGHT BE SLOW; IT WOULD PAY TO INVESTIGATE WHETHER IT CAN BE SPED UP
       ; ; Implication:
     )

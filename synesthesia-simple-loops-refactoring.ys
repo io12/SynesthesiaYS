@@ -21,7 +21,7 @@
 (define-type EIPRingBuffer       (bitvector  80)) ; 10 8-bit EIP history
 (define-type EIPBitMask          (bitvector  10)) ; 10 1-bit EIP bitmask
 
-(define-type MachineState        (bitvector 866)) 
+(define-type MachineState        (bitvector 866))
 ; 255   0: Reg32State
 ; 767 256: SCState
 ; 775 768: Byte [scptr]
@@ -297,7 +297,7 @@
 
 ; Used instead of an array lookup. Pass in byte XX, get back the bytecodeXX
 ; variable.
-(define get-byte::(-> Byte Byte) 
+(define get-byte::(-> Byte Byte)
 	(lambda (x::Byte)
     (ite (= x 0x00) bytecode00
     (ite (= x 0x01) bytecode01
@@ -709,8 +709,8 @@
   (lambda (mstate::MachineState dest::Byte eip::Byte length::Byte)
     (let ((eipbuffer (geteipbuffer mstate)))
     (let ((eipmask   (geteipmask   mstate)))
-    (let ((extra 
-      (bv-or 
+    (let ((extra
+      (bv-or
         (bv-and (bv-extract 0 0 eipmask) (bool-to-bit (= dest (bv-extract 7  0  eipbuffer))))
         (bv-and (bv-extract 1 1 eipmask) (bool-to-bit (= dest (bv-extract 15 8  eipbuffer))))
         (bv-and (bv-extract 2 2 eipmask) (bool-to-bit (= dest (bv-extract 23 16 eipbuffer))))
@@ -729,9 +729,9 @@
 
 ; symbolic-insn(eip,state). Decode an instruction at eip 'eip'. Perform the
 ; operation specified by that instruction. Consult and update the state 'state'
-; accordingly; return the new state concatenated with the length of the 
+; accordingly; return the new state concatenated with the length of the
 ; instruction. In other words, this function simulates the effects of executing
-; every possible instruction. 
+; every possible instruction.
 (define symbolic-insn::(-> (-> Byte Byte) Byte MachineState DecodedMachineState)
 	(lambda (f-get-byte::(-> Byte Byte) eip::Byte state::MachineState)
     (let ((byte0 (f-get-byte eip)))
@@ -802,19 +802,19 @@
         )))))))))))))))
     )))))))
   )
-) 
+)
 
 ; The main assertion.
-(assert 
+(assert
   ; For every possible input state (r0, ..., r7).
-  ; There is an additional universally-quantified variable idx: used to make 
+  ; There is an additional universally-quantified variable idx: used to make
   ; statements about the bytes in the encoding.
   (forall (r0::Dword r1::Dword r2::Dword r3::Dword r4::Dword r5::Dword r6::Dword r7::Dword idx::Dword scptr::Byte)
-    
+
     (let ((initialsc (bv-concat shellcode3F shellcode3E shellcode3D shellcode3C shellcode3B shellcode3A shellcode39 shellcode38 shellcode37 shellcode36 shellcode35 shellcode34 shellcode33 shellcode32 shellcode31 shellcode30 shellcode2F shellcode2E shellcode2D shellcode2C shellcode2B shellcode2A shellcode29 shellcode28 shellcode27 shellcode26 shellcode25 shellcode24 shellcode23 shellcode22 shellcode21 shellcode20 shellcode1F shellcode1E shellcode1D shellcode1C shellcode1B shellcode1A shellcode19 shellcode18 shellcode17 shellcode16 shellcode15 shellcode14 shellcode13 shellcode12 shellcode11 shellcode10 shellcode0F shellcode0E shellcode0D shellcode0C shellcode0B shellcode0A shellcode09 shellcode08 shellcode07 shellcode06 shellcode05 shellcode04 shellcode03 shellcode02 shellcode01 shellcode00)))
-    
+
     (let ((sclength 0x00000040))
-    
+
     ; ------------------------
     ; INITIALIZE STATE AND EIP
     ; ------------------------
@@ -822,11 +822,11 @@
     (let ((eip0     0x00))
     ; Create the input "state" by concatenating all of the inputs.
     (let ((state0   (bv-concat (bv-repeat 0b0 10) (bv-repeat 0x00 10) scptr initialsc r7 r6 r5 r4 r3 r2 r1 r0)))
-    
+
     ; ------------------------
     ; SIMULATE ONE INSTRUCTION
     ; ------------------------
-    
+
     ; Perform symbolic simulation of one instruction (any instruction).
     (let ((synsem0  (symbolic-insn get-byte eip0 state0)))
     ; Extract the length of the instruction.
@@ -839,11 +839,11 @@
     (let ((state1   (getmachinestate synsem0)))
     ; Extract EIP after executing the instruction.
     (let ((eip1     (geteip state1)))
-    
+
     ; ------------------------
     ; SIMULATE ONE INSTRUCTION
     ; ------------------------
-    
+
     ; Create the input "state" by concatenating all of the inputs.
     (let ((loopstate0   (bv-concat (bv-repeat 0b0 9) 0b1 (bv-repeat 0x00 9) eip1 scptr initialsc r7 r6 r5 r4 r3 r2 r1 r0)))
     ; Perform symbolic simulation of one instruction (any instruction).
@@ -862,7 +862,7 @@
     ; ------------------------
     ; SIMULATE ONE INSTRUCTION
     ; ------------------------
-    
+
     ; Perform symbolic simulation of one instruction (any instruction).
     (let ((synsem2  (symbolic-insn get-byte eip2 state2)))
     ; Extract the length of the instruction.
@@ -879,7 +879,7 @@
     ; ------------------------
     ; SIMULATE ONE INSTRUCTION
     ; ------------------------
-    
+
     ; Perform symbolic simulation of one instruction (any instruction).
     (let ((synsem3  (symbolic-insn get-byte eip3 state3)))
     ; Extract the length of the instruction.
@@ -896,7 +896,7 @@
     ; ------------------------
     ; SIMULATE ONE INSTRUCTION
     ; ------------------------
-    
+
     ; Perform symbolic simulation of one instruction (any instruction).
     (let ((synsem4  (symbolic-insn get-byte eip4 state4)))
     ; Extract the length of the instruction.
@@ -911,11 +911,11 @@
     (let ((eip5 (geteip state5)))
 
     (let ((finalloopstate state5))
-    
+
     ; ------------------------
     ; SIMULATE ONE INSTRUCTION
     ; ------------------------
-    
+
     ; Perform symbolic simulation of one instruction (any instruction).
     (let ((synsem5  (symbolic-insn get-byte eip5 state5)))
     ; Extract the length of the instruction.
@@ -939,11 +939,11 @@
     (let ((finaleip eip6))
 
     (let ((lasteip (bv-add eip5 insn5len)))
-    
+
     (let ((idxlow (bv-extract 7 0 idx)))
     (let ((sclengthlow (bv-extract 7 0 sclength)))
     (let ((l0scptr (getscptr loopstate0)))
-    
+
     ; --------------------------------------------------
     ; ISSUE CONSTRAINTS ABOUT FUNCTIONALITY AND ENCODING
     ; --------------------------------------------------
@@ -956,7 +956,7 @@
       (not (= insn3len 0x00))
       (not (= insn4len 0x00))
       (not (= insn5len 0x00))
-      
+
       ; All "extra" constraints must be satisfied
       (= 0b1 extra0)
       (= 0b1 extra1)
@@ -964,7 +964,7 @@
       (= 0b1 extra3)
       (= 0b1 extra4)
       (= 0b1 extra5)
-      
+
       ; Only the last instruction is a jump
       (= 0b0 isjcc0)
       (= 0b0 isjcc1)
@@ -979,14 +979,14 @@
       (= eip3 (bv-add eip2 insn2len))
       (= eip4 (bv-add eip3 insn3len))
       (= eip5 (bv-add eip4 insn3len))
-      
+
       ; At least one of the encoded shellcode bytes differs
       (not (= shellcode00 realscbyte00))
-      
+
       ; -----------------------------------
       ; CONSTRAINTS REGARDING FUNCTIONALITY
       ; -----------------------------------
-      
+
       ; Some register contains the shellcode length after the first block.
       (= (getreg32 WhichReg state1) sclength)
 
@@ -1004,11 +1004,11 @@
           (compare-sc-bytes (getscstate finalloopstate) realsc l0scptr)
         )
         ; THEN IT MUST ALSO BE TRUE THAT, AFTER EXECUTING THE BLOCK ...
-         
+
       )
       ; The EIP after executing the block is either the one after the loop, or at its beginning, AND
       (= finaleip (ite (= 0x00000000 (getreg32 WhichReg finalstate)) lasteip eip1))
-        
+
 
       ; ------------------------------
       ; CONSTRAINTS REGARDING ENCODING

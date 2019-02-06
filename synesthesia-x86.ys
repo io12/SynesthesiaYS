@@ -167,7 +167,7 @@
 
 ; Used instead of an array lookup. Pass in byte XX, get back the bytecodeXX
 ; variable.
-(define get-byte::(-> Byte Byte) 
+(define get-byte::(-> Byte Byte)
 	(lambda (x::Byte)
     (ite (= x 0x00) bytecode00
     (ite (= x 0x01) bytecode01
@@ -429,13 +429,13 @@
   )
 )
 
-(define get-word::(-> Byte Word) 
+(define get-word::(-> Byte Word)
 	(lambda (x::Byte)
 		(bv-concat (get-byte (bv-add x 0x01)) (get-byte x))
 	)
 )
 
-(define get-dword::(-> Byte Dword) 
+(define get-dword::(-> Byte Dword)
 	(lambda (x::Byte)
 		(bv-concat (get-byte (bv-add x 0x03)) (get-byte (bv-add x 0x02)) (get-byte (bv-add x 0x01)) (get-byte x))
 	)
@@ -512,7 +512,7 @@
   )
 )
 
-; putreg32(reg,value,state). Update 32-bit register 'reg' to value 'value' in 
+; putreg32(reg,value,state). Update 32-bit register 'reg' to value 'value' in
 ; state 'state'; return the new state.
 (define putreg32::(-> RegIdx Dword MachineState MachineState)
   (lambda (x::RegIdx y::Dword z::MachineState)
@@ -531,7 +531,7 @@
   )
 )
 
-; putreg16(reg,value,state). Update 16-bit register 'reg' to value 'value' in 
+; putreg16(reg,value,state). Update 16-bit register 'reg' to value 'value' in
 ; state 'state'; return the new state.
 (define putreg16::(-> RegIdx Word MachineState MachineState)
   (lambda (x::RegIdx y::Word z::MachineState)
@@ -550,7 +550,7 @@
   )
 )
 
-; putreg8(reg,value,state). Update 16-bit register 'reg' to value 'value' in 
+; putreg8(reg,value,state). Update 16-bit register 'reg' to value 'value' in
 ; state 'state'; return the new state.
 (define putreg8::(-> RegIdx Byte MachineState MachineState)
   (lambda (x::RegIdx y::Byte z::MachineState)
@@ -569,13 +569,13 @@
   )
 )
 
-; putflag(flag,value,state). Update 1-bit flag 'flag' to value 'value' in 
+; putflag(flag,value,state). Update 1-bit flag 'flag' to value 'value' in
 ; state 'state'; return the new state.
 (define putflag::(-> FlagIdx Bit MachineState MachineState)
   (lambda (x::FlagIdx y::Bit z::MachineState)
     (let ((rs (bv-extract 255 0   z)))
     (let ((fs (bv-extract 263 256 z)))
-    (let ((newfs 
+    (let ((newfs
     (ite (= x 0b000) (bv-concat (bv-extract 7 1 fs) y)
     (ite (= x 0b001) (bv-concat (bv-extract 7 2 fs) y (bv-extract 0 0 fs))
     (ite (= x 0b010) (bv-concat (bv-extract 7 3 fs) y (bv-extract 1 0 fs))
@@ -628,8 +628,8 @@
 
 (define x86-parity8::(-> Byte Bit)
   (lambda (b::Byte)
-    (bv-not 
-      (bv-xor 
+    (bv-not
+      (bv-xor
         (bv-extract 7 7 b) (bv-extract 6 6 b) (bv-extract 5 5 b) (bv-extract 4 4 b)
         (bv-extract 3 3 b) (bv-extract 2 2 b) (bv-extract 1 1 b) (bv-extract 0 0 b)
       ) ; end bv-xor
@@ -1250,7 +1250,7 @@
     (bv-sub b 0x1B))))
   )
 )
-    
+
 (define x86-range0x1F-mod17::(-> Byte Byte)
   (lambda (b::Byte)
     (ite (bv-slt b 0x11) b (bv-sub b 0x11))
@@ -1469,7 +1469,7 @@
       (x86-badstate state)
     (ite (= 0x07 opcode) ; pop ES
       (x86-badstate state)
-    (ite (= 0x08 opcode) ; or Eb, Gb 
+    (ite (= 0x08 opcode) ; or Eb, Gb
       (let ((modrm (get-byte eip0)))
       (let ((extra (= (bv-extract 7 6 modrm) 0b11)))
       (let ((lhsidx (bv-extract 2 0 modrm)))
@@ -1481,7 +1481,7 @@
       (let ((ms1 (putextra (bool-to-bit extra) ms)))
       (x86-done-insn ms1 0x2 opsize addrsize)
       )))))))))
-    (ite (= 0x09 opcode) ; or Ev, Gv 
+    (ite (= 0x09 opcode) ; or Ev, Gv
       (let ((modrm (get-byte eip0)))
       ; if 16-bit
         (ite (= 0b1 opsize)
@@ -1507,7 +1507,7 @@
         (x86-done-insn ms1 0x2 opsize addrsize)
         )))))))))
       )
-    (ite (= 0x0A opcode) ; or Gb, Eb 
+    (ite (= 0x0A opcode) ; or Gb, Eb
       (let ((modrm (get-byte eip0)))
       (let ((extra (= (bv-extract 7 6 modrm) 0b11)))
       (let ((lhsidx (bv-extract 5 3 modrm)))
@@ -1519,7 +1519,7 @@
       (let ((ms1 (putextra (bool-to-bit extra) ms)))
       (x86-done-insn ms1 0x2 opsize addrsize)
       )))))))))
-    (ite (= 0x0B opcode) ; or Gv, Ev 
+    (ite (= 0x0B opcode) ; or Gv, Ev
       (let ((modrm (get-byte eip0)))
       ; if 16-bit
         (ite (= 0b1 opsize)
@@ -1545,7 +1545,7 @@
         (x86-done-insn ms1 0x2 opsize addrsize)
         )))))))))
       )
-    (ite (= 0x0C opcode) ; or AL, Ib 
+    (ite (= 0x0C opcode) ; or AL, Ib
       (let ((lhs (getreg8 ALIdx state)))
       (let ((rhs (get-byte (bv-add eip 0x01))))
       (let ((mrr8 (x86-or8 lhs rhs state)))
@@ -1569,7 +1569,7 @@
         (x86-done-insn ms 0x5 opsize addrsize)
         ))))
       )
-    (ite (= 0x0E opcode) ; push CS    
+    (ite (= 0x0E opcode) ; push CS
       (x86-badstate state)
     ; (ite (= 0x0F opcode) ; two-byte opcodes
       (x86-badstate state)
@@ -1686,7 +1686,7 @@
       (x86-badstate state)
     (ite (= 0x17 opcode) ; pop SS
       (x86-badstate state)
-    (ite (= 0x18 opcode) ; sbb Eb, Gb 
+    (ite (= 0x18 opcode) ; sbb Eb, Gb
       (let ((modrm (get-byte eip0)))
       (let ((extra (= (bv-extract 7 6 modrm) 0b11)))
       (let ((lhsidx (bv-extract 2 0 modrm)))
@@ -1698,7 +1698,7 @@
       (let ((ms1 (putextra (bool-to-bit extra) ms)))
       (x86-done-insn ms1 0x2 opsize addrsize)
       )))))))))
-    (ite (= 0x19 opcode) ; sbb Ev, Gv 
+    (ite (= 0x19 opcode) ; sbb Ev, Gv
       (let ((modrm (get-byte eip0)))
       ; if 16-bit
         (ite (= 0b1 opsize)
@@ -1724,7 +1724,7 @@
         (x86-done-insn ms1 0x2 opsize addrsize)
         )))))))))
       )
-    (ite (= 0x1A opcode) ; sbb Gb, Eb 
+    (ite (= 0x1A opcode) ; sbb Gb, Eb
       (let ((modrm (get-byte eip0)))
       (let ((extra (= (bv-extract 7 6 modrm) 0b11)))
       (let ((lhsidx (bv-extract 5 3 modrm)))
@@ -1736,7 +1736,7 @@
       (let ((ms1 (putextra (bool-to-bit extra) ms)))
       (x86-done-insn ms1 0x2 opsize addrsize)
       )))))))))
-    (ite (= 0x1B opcode) ; sbb Gv, Ev 
+    (ite (= 0x1B opcode) ; sbb Gv, Ev
       (let ((modrm (get-byte eip0)))
       ; if 16-bit
         (ite (= 0b1 opsize)
@@ -1762,7 +1762,7 @@
         (x86-done-insn ms1 0x2 opsize addrsize)
         )))))))))
       )
-    (ite (= 0x1C opcode) ; sbb AL, Ib 
+    (ite (= 0x1C opcode) ; sbb AL, Ib
       (let ((lhs (getreg8 ALIdx state)))
       (let ((rhs (get-byte (bv-add eip 0x01))))
       (let ((mrr8 (x86-sbb8 lhs rhs state)))
@@ -1786,7 +1786,7 @@
         (x86-done-insn ms 0x5 opsize addrsize)
         ))))
       )
-    (ite (= 0x1E opcode) ; push DS    
+    (ite (= 0x1E opcode) ; push DS
       (x86-badstate state)
     ; (ite (= 0x1F opcode) ; pop DS
       (x86-badstate state)
@@ -1902,7 +1902,7 @@
       (x86-badstate state)
     (ite (= 0x27 opcode) ; daa
       (x86-badstate state)
-    (ite (= 0x28 opcode) ; sub Eb, Gb 
+    (ite (= 0x28 opcode) ; sub Eb, Gb
       (let ((modrm (get-byte eip0)))
       (let ((extra (= (bv-extract 7 6 modrm) 0b11)))
       (let ((lhsidx (bv-extract 2 0 modrm)))
@@ -1914,7 +1914,7 @@
       (let ((ms1 (putextra (bool-to-bit extra) ms)))
       (x86-done-insn ms1 0x2 opsize addrsize)
       )))))))))
-    (ite (= 0x29 opcode) ; sub Ev, Gv 
+    (ite (= 0x29 opcode) ; sub Ev, Gv
       (let ((modrm (get-byte eip0)))
       ; if 16-bit
         (ite (= 0b1 opsize)
@@ -1940,7 +1940,7 @@
         (x86-done-insn ms1 0x2 opsize addrsize)
         )))))))))
       )
-    (ite (= 0x2A opcode) ; sub Gb, Eb 
+    (ite (= 0x2A opcode) ; sub Gb, Eb
       (let ((modrm (get-byte eip0)))
       (let ((extra (= (bv-extract 7 6 modrm) 0b11)))
       (let ((lhsidx (bv-extract 5 3 modrm)))
@@ -1952,7 +1952,7 @@
       (let ((ms1 (putextra (bool-to-bit extra) ms)))
       (x86-done-insn ms1 0x2 opsize addrsize)
       )))))))))
-    (ite (= 0x2B opcode) ; sub Gv, Ev 
+    (ite (= 0x2B opcode) ; sub Gv, Ev
       (let ((modrm (get-byte eip0)))
       ; if 16-bit
         (ite (= 0b1 opsize)
@@ -1978,7 +1978,7 @@
         (x86-done-insn ms1 0x2 opsize addrsize)
         )))))))))
       )
-    (ite (= 0x2C opcode) ; sub AL, Ib 
+    (ite (= 0x2C opcode) ; sub AL, Ib
       (let ((lhs (getreg8 ALIdx state)))
       (let ((rhs (get-byte (bv-add eip 0x01))))
       (let ((mrr8 (x86-sub8 lhs rhs state)))
@@ -2118,7 +2118,7 @@
       (x86-badstate state)
     (ite (= 0x37 opcode) ; aaa
       (x86-badstate state)
-    (ite (= 0x38 opcode) ; cmp Eb, Gb 
+    (ite (= 0x38 opcode) ; cmp Eb, Gb
       (let ((modrm (get-byte eip0)))
       (let ((extra (= (bv-extract 7 6 modrm) 0b11)))
       (let ((lhsidx (bv-extract 2 0 modrm)))
@@ -2130,7 +2130,7 @@
       (let ((ms1 (putextra (bool-to-bit extra) ms)))
       (x86-done-insn ms1 0x2 opsize addrsize)
       )))))))))
-    (ite (= 0x39 opcode) ; cmp Ev, Gv 
+    (ite (= 0x39 opcode) ; cmp Ev, Gv
       (let ((modrm (get-byte eip0)))
       ; if 16-bit
         (ite (= 0b1 opsize)
@@ -2156,7 +2156,7 @@
         (x86-done-insn ms1 0x2 opsize addrsize)
         )))))))))
       )
-    (ite (= 0x3A opcode) ; cmp Gb, Eb 
+    (ite (= 0x3A opcode) ; cmp Gb, Eb
       (let ((modrm (get-byte eip0)))
       (let ((extra (= (bv-extract 7 6 modrm) 0b11)))
       (let ((lhsidx (bv-extract 5 3 modrm)))
@@ -2168,7 +2168,7 @@
       (let ((ms1 (putextra (bool-to-bit extra) ms)))
       (x86-done-insn ms1 0x2 opsize addrsize)
       )))))))))
-    (ite (= 0x3B opcode) ; cmp Gv, Ev 
+    (ite (= 0x3B opcode) ; cmp Gv, Ev
       (let ((modrm (get-byte eip0)))
       ; if 16-bit
         (ite (= 0b1 opsize)
@@ -2194,7 +2194,7 @@
         (x86-done-insn ms1 0x2 opsize addrsize)
         )))))))))
       )
-    (ite (= 0x3C opcode) ; cmp AL, Ib 
+    (ite (= 0x3C opcode) ; cmp AL, Ib
       (let ((lhs (getreg8 ALIdx state)))
       (let ((rhs (get-byte (bv-add eip 0x01))))
       (let ((mrr8 (x86-sub8 lhs rhs state)))
@@ -2531,7 +2531,7 @@
 (define x86-singlebyte-0x8F-0x80::(-> Byte MachineState Bit Bit DecodedMachineState)
   (lambda (eip::Byte state::MachineState opsize::Bit addrsize::Bit)
     (let ((opcode (get-byte eip)))
-    (let ((eip0 (bv-add eip 0x01)))   
+    (let ((eip0 (bv-add eip 0x01)))
     (let ((modrm (get-byte eip0)))
     (let ((ggg   (bv-extract 5 3 modrm)))
     (let ((epart (bv-extract 2 0 modrm)))
@@ -2902,7 +2902,7 @@
                                              ; xchg rAX, rBPr13
                                              ; xchg rAX, rSIr14
                                              ; xchg rAX, rDIr15
-      (ite (= 0b1 opsize) 
+      (ite (= 0b1 opsize)
         (let ((lhs (getreg16 lhsidx state)))
         (let ((rhs (getreg16 rhsidx state)))
         (let ((s1  (putreg16 lhsidx rhs state)))
@@ -2942,7 +2942,7 @@
 (define x86-singlebyte-0xAF-0xA0::(-> Byte MachineState Bit Bit DecodedMachineState)
   (lambda (eip::Byte state::MachineState opsize::Bit addrsize::Bit)
     (let ((opcode (get-byte eip)))
-    (let ((eip0 (bv-add eip 0x01)))   
+    (let ((eip0 (bv-add eip 0x01)))
     (ite (= 0xA0 opcode) ; mov AL, Ob
       (x86-badstate state)
     (ite (= 0xA1 opcode) ; mov rAX, Ov
@@ -3000,11 +3000,11 @@
 (define x86-singlebyte-0xBF-0xB0::(-> Byte MachineState Bit Bit DecodedMachineState)
   (lambda (eip::Byte state::MachineState opsize::Bit addrsize::Bit)
     (let ((opcode (get-byte eip)))
-    (let ((eip0 (bv-add eip 0x01)))   
+    (let ((eip0 (bv-add eip 0x01)))
     (let ((lhsidx (bv-extract 2 0 opcode)))
     (let ((isupper (bv-extract 3 3 opcode)))
-    (ite (= 0b0 isupper) ; mov ALR8L, Ib 
-                         ; mov CLR9L, Ib 
+    (ite (= 0b0 isupper) ; mov ALR8L, Ib
+                         ; mov CLR9L, Ib
                          ; mov DLR10L, Ib
                          ; mov BLR11L, Ib
                          ; mov AHR12L, Ib
@@ -3013,8 +3013,8 @@
                          ; mov BHR15L, Ib
       (let ((rhs (get-byte eip0)))
       (x86-done-insn (putreg8 lhsidx rhs state) 0x2 opsize addrsize))
-    (ite (= 0b1 opsize) ; mov rAXr8, Iv 
-                        ; mov rCXr9, Iv 
+    (ite (= 0b1 opsize) ; mov rAXr8, Iv
+                        ; mov rCXr9, Iv
                         ; mov rDXr10, Iv
                         ; mov rBXr11, Iv
                         ; mov rSPr12, Iv
@@ -3032,7 +3032,7 @@
 (define x86-singlebyte-0xCF-0xC0::(-> Byte MachineState Bit Bit DecodedMachineState)
   (lambda (eip::Byte state::MachineState opsize::Bit addrsize::Bit)
     (let ((opcode (get-byte eip)))
-    (let ((eip0 (bv-add eip 0x01)))   
+    (let ((eip0 (bv-add eip 0x01)))
     (let ((modrm (get-byte eip0)))
     (let ((ggg   (bv-extract 5 3 modrm)))
     (let ((epart (bv-extract 2 0 modrm)))
@@ -3204,7 +3204,7 @@
 (define x86-singlebyte-0xDF-0xD0::(-> Byte MachineState Bit Bit DecodedMachineState)
   (lambda (eip::Byte state::MachineState opsize::Bit addrsize::Bit)
     (let ((opcode (get-byte eip)))
-    (let ((eip0 (bv-add eip 0x01)))   
+    (let ((eip0 (bv-add eip 0x01)))
     (let ((modrm (get-byte eip0)))
     (let ((ggg   (bv-extract 5 3 modrm)))
     (let ((epart (bv-extract 2 0 modrm)))
@@ -3549,30 +3549,30 @@
 ;     (ite (= 0xF4 opcode) ; hlt
 ;       (x86-badstate state)
 ;     (ite (= 0xF5 opcode) ; cmc
-;       (                           
-;       )                           
+;       (
+;       )
 ;     (ite (= 0xF6 opcode) ; GROUP TODO
-;       (                           
-;       )                           
+;       (
+;       )
 ;     (ite (= 0xF7 opcode) ; GROUP TODO
-;       (                               
-;       )                               
+;       (
+;       )
 ;     (ite (= 0xF8 opcode) ; clc
-;       (                               
-;       )                               
+;       (
+;       )
 ;     (ite (= 0xF9 opcode) ; stc
-;       (                               
-;       )                               
+;       (
+;       )
 ;     (ite (= 0xFA opcode) ; cli
 ;       (x86-badstate state)
 ;     (ite (= 0xFB opcode) ; sti
 ;       (x86-badstate state)
 ;     (ite (= 0xFC opcode) ; cld
-;       (                               
-;       )                               
+;       (
+;       )
 ;     (ite (= 0xFD opcode) ; std
-;       (                               
-;       )                               
+;       (
+;       )
 ;     (ite (= 0xFE opcode) ; GROUP TODO
 ;       (
 ;       )
@@ -3610,9 +3610,9 @@
 
 ; symbolic-insn(eip,state). Decode an instruction at eip 'eip'. Perform the
 ; operation specified by that instruction. Consult and update the state 'state'
-; accordingly; return the new state concatenated with the length of the 
+; accordingly; return the new state concatenated with the length of the
 ; instruction. In other words, this function simulates the effects of executing
-; every possible instruction. 
+; every possible instruction.
 (define symbolic-insn::(-> Byte MachineState DecodedMachineState)
 	(lambda (eip::Byte state::MachineState)
     (let ((has-opsize (consume-opsize-prefix eip)))
@@ -3624,9 +3624,9 @@
 ) ; end define
 ; The main assertion.
 
-(assert 
+(assert
   ; For every possible input state (r0, ..., r7).
-  ; There is an additional universally-quantified variable idx: used to make 
+  ; There is an additional universally-quantified variable idx: used to make
   ; statements about the bytes in the encoding.
   (forall (cf::(bitvector 1) pf::(bitvector 1) af::(bitvector 1) zf::(bitvector 1) sf::(bitvector 1) df::(bitvector 1) of::(bitvector 1) eax::(bitvector 32) ecx::(bitvector 32) edx::(bitvector 32) ebx::(bitvector 32) esp::(bitvector 32) ebp::(bitvector 32) esi::(bitvector 32) edi::(bitvector 32) idx::(bitvector 8))
     ; ------------------------
@@ -3634,7 +3634,7 @@
     ; ------------------------
     ; For any extra constraints, like "modrm byte was a register"
     (let ((extra0 true))
-    
+
     ; Create the input "state" by concatenating all of the inputs.
     (let ((state0   (bv-concat 0b1 of df sf zf af pf cf edi esi ebp esp ebx edx ecx eax)))
 
@@ -3654,7 +3654,7 @@
     (let ((state2 (bv-extract 263 0 decstate2)))
     (let ((extra2 (and extra1 (= 0b1 (getextra state2)))))
     (let ((lenpred2 (and lenpred1 (/= len2 0x0))))
-    
+
     ; THIRD INSTRUCTION
     (let ((eip2 (bv-add (bv-zero-extend len2 4) eip1)))
     (let ((decstate3 (symbolic-insn eip2 state2)))
@@ -3670,7 +3670,7 @@
     (let ((state4 (bv-extract 263 0 decstate4)))
     (let ((extra4 (and extra3 (= 0b1 (getextra state4)))))
     (let ((lenpred4 (and lenpred3 (/= len4 0x0))))
-    
+
     ; FIFTH INSTRUCTION
     (let ((eip4 (bv-add (bv-zero-extend len4 4) eip3)))
     (let ((decstate5 (symbolic-insn eip4 state4)))
@@ -3686,7 +3686,7 @@
     (let ((state6 (bv-extract 263 0 decstate6)))
     (let ((extra6 (and extra5 (= 0b1 (getextra state6)))))
     (let ((lenpred6 (and lenpred5 (/= len6 0x0))))
-    
+
     ; SEVENTH INSTRUCTION
     (let ((eip6 (bv-add (bv-zero-extend len6 4) eip5)))
     (let ((decstate7 (symbolic-insn eip6 state6)))
@@ -3702,7 +3702,7 @@
     (let ((state8 (bv-extract 263 0 decstate8)))
     (let ((extra8 (and extra7 (= 0b1 (getextra state8)))))
     (let ((lenpred8 (and lenpred7 (/= len8 0x0))))
-    
+
     ; NINTH INSTRUCTION
     (let ((eip8 (bv-add (bv-zero-extend len8 4) eip7)))
     (let ((decstate9 (symbolic-insn eip8 state8)))
@@ -3726,7 +3726,7 @@
     (let ((stateB (bv-extract 263 0 decstateB)))
     (let ((extraB (and extraA (= 0b1 (getextra stateB)))))
     (let ((lenpredB (and lenpredA (/= lenB 0x0))))
-    
+
     ; TWELVTH INSTRUCTION
     (let ((eipB (bv-add (bv-zero-extend lenB 4) eipA)))
     (let ((decstateC (symbolic-insn eipB stateB)))
@@ -3742,7 +3742,7 @@
     (let ((stateD (bv-extract 263 0 decstate4)))
     (let ((extraD (and extraC (= 0b1 (getextra state4)))))
     (let ((lenpredD (and lenpredC (/= lenD 0x0))))
-    
+
     ; FOURTEENTH INSTRUCTION
     (let ((eipD (bv-add (bv-zero-extend lenD 4) eipC)))
     (let ((decstateE (symbolic-insn eipD state4)))
@@ -3758,7 +3758,7 @@
     (let ((stateF (bv-extract 263 0 decstateF)))
     (let ((extraF (and extraE (= 0b1 (getextra stateF)))))
     (let ((lenpredF (and lenpredE (/= lenF 0x0))))
-    
+
     ; SIXTEENTH INSTRUCTION
     (let ((eipF (bv-add (bv-zero-extend lenF 4) eipE)))
     (let ((decstate10 (symbolic-insn eipF stateF)))
@@ -3774,7 +3774,7 @@
     (let ((state11 (bv-extract 263 0 decstate11)))
     (let ((extra11 (and extra10 (= 0b1 (getextra state11)))))
     (let ((lenpred11 (and lenpred10 (/= len11 0x0))))
-    
+
     ; EIGHTEENTH INSTRUCTION
     (let ((eip11 (bv-add (bv-zero-extend len11 4) eip10)))
     (let ((decstate12 (symbolic-insn eip11 state11)))
@@ -3826,7 +3826,7 @@
       (ite (= NumInstrs 0x12) state12
       (ite (= NumInstrs 0x13) state13
                               state14)))))))))))))))))))))
-                              
+
     ; Call the final EIP "finaleip" (for convenience).
     (let ((finaleip
       (ite (= NumInstrs 0x01) eip1
@@ -3907,7 +3907,7 @@
 
         ; All additional constraints are valid
         extrapred
-        
+
         ; (bv-gt NumInstrs 0x00)
         (= NumInstrs 0x03)
 
@@ -3926,7 +3926,7 @@
         ; Effect on state: eax becomes 0x00000000; all other registers preserved.
         (= (getreg32 EaxIdx finalstate) 0x12345678)
         ; (= (getreg8 AHIdx finalstate)
-        ;   (bv-add 
+        ;   (bv-add
         ;     (bv-zero-extend (bv-extract 0 0 (getreg8 ALIdx state0)) 7)
         ;     (bv-zero-extend (bv-extract 1 1 (getreg8 ALIdx state0)) 7)
         ;     (bv-zero-extend (bv-extract 2 2 (getreg8 ALIdx state0)) 7)
@@ -3944,7 +3944,7 @@
         (= (getreg32 EbpIdx finalstate) ebp)
         (= (getreg32 EsiIdx finalstate) esi)
         (= (getreg32 EdiIdx finalstate) edi)
-   
+
         ; ------------------------------
         ; CONSTRAINTS REGARDING ENCODING
         ; ------------------------------

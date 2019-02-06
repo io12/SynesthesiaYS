@@ -154,7 +154,7 @@
 
 ; Used instead of an array lookup. Pass in byte XX, get back the bytecodeXX
 ; variable.
-(define get-byte::(-> Byte Byte) 
+(define get-byte::(-> Byte Byte)
 	(lambda (x::Byte)
     (ite (= x 0x00) bytecode00
     (ite (= x 0x01) bytecode01
@@ -449,9 +449,9 @@
 
 ; symbolic-insn(eip,state). Decode an instruction at eip 'eip'. Perform the
 ; operation specified by that instruction. Consult and update the state 'state'
-; accordingly; return the new state concatenated with the length of the 
+; accordingly; return the new state concatenated with the length of the
 ; instruction. In other words, this function simulates the effects of executing
-; every possible instruction. 
+; every possible instruction.
 (define symbolic-insn::(-> (-> Byte Byte) Byte Reg32State (bitvector 264))
 	(lambda (f-get-byte::(-> Byte Byte) eip::Byte state::Reg32State)
     (let ((byte0 (f-get-byte eip)))
@@ -518,12 +518,12 @@
         (bv-concat 0x05 newstate)))))))))))))))
     )))))
   )
-) 
+)
 
 ; The main assertion.
-(assert 
+(assert
   ; For every possible input state (r0, ..., r7).
-  ; There is an additional universally-quantified variable idx: used to make 
+  ; There is an additional universally-quantified variable idx: used to make
   ; statements about the bytes in the encoding.
   (forall (r0::Dword r1::Dword r2::Dword r3::Dword r4::Dword r5::Dword r6::Dword r7::Dword idx::Byte)
     ; ------------------------
@@ -533,11 +533,11 @@
     (let ((state0   (bv-concat r7 r6 r5 r4 r3 r2 r1 r0)))
     ; Set initial EIP to zero.
     (let ((eip0     0x00))
-    
+
     ; ------------------------
     ; SIMULATE ONE INSTRUCTION
     ; ------------------------
-    
+
     ; Perform symbolic simulation of one instruction (any instruction).
     (let ((synsem0  (symbolic-insn get-byte eip0 state0)))
     ; Extract the length of the instruction.
@@ -546,11 +546,11 @@
     (let ((state1   (bv-extract 255   0 synsem0)))
     ; Extract EIP after executing the instruction.
     (let ((eip1     (bv-add eip0 insn0len)))
-    
+
     ; ------------------------
     ; SIMULATE ONE INSTRUCTION
     ; ------------------------
-    
+
     ; Perform symbolic simulation of one instruction (any instruction).
     (let ((synsem1  (symbolic-insn get-byte eip1 state1)))
     ; Extract the length of the instruction.
@@ -568,7 +568,7 @@
     (let ((finalstate state2))
     ; Call the final EIP "finaleip" (for convenience).
     (let ((finaleip eip2))
-    
+
     ; --------------------------------------------------
     ; ISSUE CONSTRAINTS ABOUT FUNCTIONALITY AND ENCODING
     ; --------------------------------------------------
@@ -577,11 +577,11 @@
       ; 0-length instructions are invalid; both instructions must be valid.
       (not (= insn0len 0x00))
       (not (= insn1len 0x00))
-      
+
       ; -----------------------------------
       ; CONSTRAINTS REGARDING FUNCTIONALITY
       ; -----------------------------------
-      
+
       ; Effect on state: r0 becomes 0x12345678; all other registers preserved.
       (= (getreg32 R0Idx finalstate) (bv-add r0 0x00000001))
       (= (getreg32 R1Idx finalstate) r1)

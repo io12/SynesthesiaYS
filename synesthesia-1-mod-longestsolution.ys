@@ -129,7 +129,7 @@
 
 ; Used instead of an array lookup. Pass in byte XX, get back the bytecodeXX
 ; variable.
-(define get-byte::(-> (bitvector 8) (bitvector 8)) 
+(define get-byte::(-> (bitvector 8) (bitvector 8))
 	(lambda (x::(bitvector 8))
     (ite (= x 0x00) bytecode00
     (ite (= x 0x01) bytecode01
@@ -424,9 +424,9 @@
 
 ; symbolic-insn(eip,state). Decode an instruction at eip 'eip'. Perform the
 ; operation specified by that instruction. Consult and update the state 'state'
-; accordingly; return the new state concatenated with the length of the 
+; accordingly; return the new state concatenated with the length of the
 ; instruction. In other words, this function simulates the effects of executing
-; every possible instruction. 
+; every possible instruction.
 (define symbolic-insn::(-> (-> (bitvector 8) (bitvector 8)) (bitvector 8) (bitvector 256) (bitvector 264))
 	(lambda (f-get-byte::(-> (bitvector 8) (bitvector 8)) eip::(bitvector 8) state::(bitvector 256))
     (let ((byte0 (f-get-byte eip)))
@@ -493,18 +493,18 @@
         (bv-concat 0x05 newstate)))))))))))))))
     )))))
   )
-) 
+)
 
-(define get-byte-big::(-> (bitvector 2048) (bitvector 8) (bitvector 8)) 
+(define get-byte-big::(-> (bitvector 2048) (bitvector 8) (bitvector 8))
 	(lambda (mem::(bitvector 2048) x::(bitvector 8))
     (bv-extract 7 0 (bv-lshr mem (bv-zero-extend x 2040)))
   )
 )
 
 ; The main assertion.
-(assert 
+(assert
   ; For every possible input state (r0, ..., r7).
-  ; There is an additional universally-quantified variable idx: used to make 
+  ; There is an additional universally-quantified variable idx: used to make
   ; statements about the bytes in the encoding.
   (forall (r0::(bitvector 32) r1::(bitvector 32) r2::(bitvector 32) r3::(bitvector 32) r4::(bitvector 32) r5::(bitvector 32) r6::(bitvector 32) r7::(bitvector 32) idx::(bitvector 8) othermem::(bitvector 2048))
     ; ------------------------
@@ -517,11 +517,11 @@
     (let ((state0   (bv-concat r7 r6 r5 r4 r3 r2 r1 r0)))
     ; Set initial EIP to zero.
     (let ((eip0     0x00))
-    
+
     ; ------------------------
     ; SIMULATE ONE INSTRUCTION
     ; ------------------------
-    
+
     ; Perform symbolic simulation of one instruction (any instruction).
     (let ((synsem0  (symbolic-insn get-byte eip0 state0)))
     ; Extract the length of the instruction.
@@ -530,11 +530,11 @@
     (let ((state1   (bv-extract 255   0 synsem0)))
     ; Extract EIP after executing the instruction.
     (let ((eip1     (bv-add eip0 insn0len)))
-    
+
     ; ------------------------
     ; SIMULATE ONE INSTRUCTION
     ; ------------------------
-    
+
     ; Perform symbolic simulation of one instruction (any instruction).
     (let ((synsem1  (symbolic-insn get-byte eip1 state1)))
     ; Extract the length of the instruction.
@@ -552,11 +552,11 @@
     (let ((finalstate state2))
     ; Call the final EIP "finaleip" (for convenience).
     (let ((finaleip eip2))
-    
+
     ; ------------------------
     ; OTHER: SIMULATE ONE INSTRUCTION
     ; ------------------------
-    
+
     ; Perform symbolic simulation of one instruction (any instruction).
     (let ((othersynsem0  (symbolic-insn my-get-byte eip0 state0)))
     ; Extract the length of the instruction.
@@ -565,11 +565,11 @@
     (let ((otherstate1   (bv-extract 255   0 othersynsem0)))
     ; Extract EIP after executing the instruction.
     (let ((othereip1     (bv-add eip0 otherinsn0len)))
-    
+
     ; ------------------------
     ; OTHER: SIMULATE ONE INSTRUCTION
     ; ------------------------
-    
+
     ; Perform symbolic simulation of one instruction (any instruction).
     (let ((othersynsem1  (symbolic-insn my-get-byte othereip1 otherstate1)))
     ; Extract the length of the instruction.
@@ -596,11 +596,11 @@
       ; 0-length instructions are invalid; both instructions must be valid.
       (not (= insn0len 0x00))
       (not (= insn1len 0x00))
-      
+
       ; -----------------------------------
       ; CONSTRAINTS REGARDING FUNCTIONALITY
       ; -----------------------------------
-      
+
       ; Effect on state: r0 becomes 0x12345678; all other registers preserved.
       (= (getstate 0b000 finalstate) (bv-add r0 0x00000001))
       (= (getstate 0b001 finalstate) r1)

@@ -1,16 +1,16 @@
 (define bytecode::(-> (bitvector 8) (bitvector 8)))
 
-(assert 
+(assert
   (forall (r0::(bitvector 32) r1::(bitvector 32) r2::(bitvector 32) r3::(bitvector 32) r4::(bitvector 32) r5::(bitvector 32) r6::(bitvector 32) r7::(bitvector 32))
     (let ((eip0 0x00))
-    (let ((state00 (update (lambda (x::(bitvector 3)) r0) (0b000) r0))) 
-    (let ((state01 (update state00 (0b001) r1))) 
-    (let ((state02 (update state01 (0b010) r2))) 
-    (let ((state03 (update state02 (0b011) r3))) 
-    (let ((state04 (update state03 (0b100) r4))) 
-    (let ((state05 (update state04 (0b101) r5))) 
-    (let ((state06 (update state05 (0b110) r6))) 
-    (let ((state   (update state06 (0b111) r7))) 
+    (let ((state00 (update (lambda (x::(bitvector 3)) r0) (0b000) r0)))
+    (let ((state01 (update state00 (0b001) r1)))
+    (let ((state02 (update state01 (0b010) r2)))
+    (let ((state03 (update state02 (0b011) r3)))
+    (let ((state04 (update state03 (0b100) r4)))
+    (let ((state05 (update state04 (0b101) r5)))
+    (let ((state06 (update state05 (0b110) r6)))
+    (let ((state   (update state06 (0b111) r7)))
     (let ((insn0byte (bytecode eip0)))
     (let ((synsem0
       (ite (= (bv-and insn0byte 0xC0) 0x00)
