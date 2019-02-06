@@ -18,13 +18,12 @@ def parse_sexpr(s):
 def sexprs_to_bytes(sexprs):
     num_instrs = list(filter(lambda sexpr: sexpr[1] == 'NumInstrs', sexprs))[0][2]
     sexprs = filter(lambda sexpr: sexpr[1] != 'NumInstrs', sexprs)
-    #sexprs = filter(lambda sexpr: sexpr[1] < num_instrs, sexprs)
     sexprs = sorted(sexprs, key=lambda sexpr: sexpr[1])
-    return bytes(map(lambda sexpr: sexpr[2], sexprs))
+    return num_instrs, bytes(map(lambda sexpr: sexpr[2], sexprs))
 
 
 if __name__ == '__main__':
-    sexprs = list(map(parse_sexpr, sys.stdin.readlines()[1:]))
+    num_instrs, sexprs = list(map(parse_sexpr, sys.stdin.readlines()[1:]))
     b = sexprs_to_bytes(sexprs)
     print(repr(b))
-    print(pwn.disasm(b))
+    print(pwn.disasm(b[:num_instrs]))
