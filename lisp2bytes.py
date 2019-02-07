@@ -23,7 +23,8 @@ def sexprs_to_bytes(sexprs):
 
 
 if __name__ == '__main__':
-    num_instrs, sexprs = list(map(parse_sexpr, sys.stdin.readlines()[1:]))
-    b = sexprs_to_bytes(sexprs)
+    sexprs = list(map(parse_sexpr, sys.stdin.readlines()[1:]))
+    num_instrs, b = sexprs_to_bytes(sexprs)
+    print(f'num_instrs = {num_instrs}')
     print(repr(b))
-    print(pwn.disasm(b[:num_instrs]))
+    print(pwn.disasm(b))

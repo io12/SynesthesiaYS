@@ -3909,7 +3909,7 @@
         extrapred
 
         ; (bv-gt NumInstrs 0x00)
-        (= NumInstrs 0x03)
+        ; (= NumInstrs 0x03)
 
 ;(let ((x (getreg8 ALIdx state0)))
 ;(let ((y (getreg8 ALIdx finalstate)))
@@ -3924,7 +3924,8 @@
 ;                                (= 0x00 y)))))))))))
 
         ; Effect on state: eax becomes 0x00000000; all other registers preserved.
-        (= (getreg32 EaxIdx finalstate) 0x12345678)
+        (= (getreg32 EaxIdx finalstate) 0xdeadbeef)
+        (= (getreg32 EbxIdx finalstate) 0x0badc0de)
         ; (= (getreg8 AHIdx finalstate)
         ;   (bv-add
         ;     (bv-zero-extend (bv-extract 0 0 (getreg8 ALIdx state0)) 7)
@@ -3937,13 +3938,13 @@
         ;     (bv-zero-extend (bv-extract 7 7 (getreg8 ALIdx state0)) 7)
         ;   )
         ; )
-        (= (getreg32 EcxIdx finalstate) ecx)
-        (= (getreg32 EdxIdx finalstate) edx)
-        (= (getreg32 EbxIdx finalstate) ebx)
-        (= (getreg32 EspIdx finalstate) esp)
-        (= (getreg32 EbpIdx finalstate) ebp)
-        (= (getreg32 EsiIdx finalstate) esi)
-        (= (getreg32 EdiIdx finalstate) edi)
+        ; (= (getreg32 EcxIdx finalstate) ecx)
+        ; (= (getreg32 EdxIdx finalstate) edx)
+        ; (= (getreg32 EbxIdx finalstate) ebx)
+        ; (= (getreg32 EspIdx finalstate) esp)
+        ; (= (getreg32 EbpIdx finalstate) ebp)
+        ; (= (getreg32 EsiIdx finalstate) esi)
+        ; (= (getreg32 EdiIdx finalstate) edi)
 
         ; ------------------------------
         ; CONSTRAINTS REGARDING ENCODING
