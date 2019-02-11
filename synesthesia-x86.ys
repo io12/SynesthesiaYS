@@ -29,6 +29,17 @@
 (define OFIdx::RegIdx (mk-bv 3 6)) ; OF = 6
 
 (define-type Reg32State   (bitvector 256))
+; MachineState
+; offset, size, reg
+;   0 32 eax
+;  32 32 ecx
+;  64 32 edx
+;  96 32 ebx
+; 128 32 esp
+; 160 32 ebp
+; 192 32 esi
+; 224 32 edi
+; 256  8 fs
 (define-type MachineState (bitvector 264))
 (define-type MachineStateRes8 (bitvector 272))
 (define-type MachineStateRes16 (bitvector 280))
