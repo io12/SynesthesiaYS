@@ -102,8 +102,116 @@ def parse(s):
     return parse_toks(toks)
 
 
+def y2s_expr(e):
+    if type(ty) is list:
+        s = ty[0]
+        if s == 'forall':
+            pass
+        elif s == 'exists':
+            pass
+        elif s == 'lambda':
+            pass
+        elif s == 'let':
+            pass
+        elif s == 'update':
+            pass
+        else:
+            pass # TODO: Function call
+    elif ty == 'true':
+        pass
+    elif ty == 'false':
+        pass
+    else:
+        pass # TODO: symbol, number, binarybv, hexabv
+
+
+def y2s_type(ty):
+    if type(ty) is list:
+        s = ty[0]
+        if s == 'tuple':
+            pass
+        elif s == '->':
+            pass
+        elif s == 'bitvector':
+            pass
+    elif ty == 'int':
+        pass
+    elif ty == 'bool':
+        pass
+    elif ty == 'real':
+        pass
+    else:
+        pass # TODO: symbol
+
+
+def y2s_typedef(tydef):
+    if type(tydef) is list and tydef[0] == 'scalar':
+        pass # TODO: Handle scalar
+    else:
+        pass # TODO: Handle type
+
+
+def y2s_cmd(cmd):
+    s = cmd[0]
+    if s == 'define-type':
+        return ['declare-datatype', y2s_type(cmd[1])]
+    elif s == 'define':
+        pass
+    elif s == 'assert':
+        pass
+    elif s == 'exit':
+        pass
+    elif s == 'check':
+        pass
+    elif s == 'check-assuming':
+        pass
+    elif s == 'push':
+        pass
+    elif s == 'pop':
+        pass
+    elif s == 'reset':
+        pass
+    elif s == 'show-model':
+        pass
+    elif s == 'eval':
+        pass
+    elif s == 'echo':
+        pass
+    elif s == 'include':
+        pass
+    elif s == 'set-param':
+        pass
+    elif s == 'show-param':
+        pass
+    elif s == 'show-params':
+        pass
+    elif s == 'show-stats':
+        pass
+    elif s == 'reset-stats':
+        pass
+    elif s == 'set-timeout':
+        pass
+    elif s == 'show-timeout':
+        pass
+    elif s == 'dump-context':
+        pass
+    elif s == 'help':
+        pass
+    elif s == 'ef-solve':
+        pass
+    elif s == 'export-to-dimacs':
+        pass
+    elif s == 'show-implicant':
+        pass
+    elif s == 'show-unsat-core':
+        pass
+    elif s == 'show-unsat-assumptions':
+        pass
+
+
 def yices2smtlib(ast):
-    pass
+    '''Convert a yices program to SMT-LIB'''
+    return list(map(y2s_cmd, ast))
 
 
 if __name__ == '__main__':
