@@ -153,10 +153,18 @@ def y2s_typedef(tydef):
 
 def y2s_cmd(cmd):
     s = cmd[0]
+    # ( define-type <symbol> <typedef> )
+    # ( define-sort <symbol> ( <symbol>* ) <sort> )
     if s == 'define-type':
-        return ['declare-datatype', y2s_type(cmd[1])]
-    elif s == 'define':
-        pass
+        return ['define-sort', cmd[1], [], y2s_typedef(cmd[2])]
+    # ( define <symbol> :: <type> )
+    # ( declare-const <symbol> <sort> )
+    elif s == 'define' and len(cmd) == 4:
+        return ['declare-const', cmd[1], y2s_type(cmd[3])]
+    # ( define <symbol> :: <type> <expression> )
+    # ( define-fun <symbol> ( <sorted_var>* ) <sort> <term> )
+    elif s == 'define' and len(cmd) == 5:
+        return ['define-fun', cmd[1], [], ]
     elif s == 'assert':
         pass
     elif s == 'exit':
