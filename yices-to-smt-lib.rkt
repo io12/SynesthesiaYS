@@ -97,7 +97,9 @@
 	 [(list 'show-unsat-core)
 	  '(get-unsat-core)]
 	 [(list 'show-unsat-assumptions)
-	  '(get-unsat-assumptions)]))
+	  '(get-unsat-assumptions)]
+         [bad
+          (error "unrecognized" bad)]))
 
 ; Convert yices program to SMT-LIB
 (define (yices->smtlib yices-prog)
@@ -120,9 +122,11 @@
        (open-input-file (car input-file)))))
 
 ; Read the input file
-; TODO: Handle type annotations
+; TODO: Handle type annotations a better way
 ; TODO: Preserve comments
-(define yices-prog (port->list read in-port))
+(define yices-prog (port->list read
+                    (open-input-string
+                     (string-replace (port->string in-port) "::" " :: "))))
 
 ; Convert to SMT-LIB
 (define smtlib-prog (yices->smtlib yices-prog))
