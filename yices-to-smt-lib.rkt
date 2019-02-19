@@ -21,6 +21,16 @@
     [(list-rest sym args)
      (cons sym (map y2s-expr args))]))
 
+; <binding> ::= ( <symbol> <expr> )
+(define (y2s-binding binding)
+  (match binding
+    [(list sym expr)
+     (list sym (y2s-expr expr))]))
+
+; <bindings> ::= ( <binding> ... <binding> )
+(define (y2s-bindings bindings)
+  (map y2s-binding bindings))
+
 ; <expr> ::=
 ; true
 ; | false
@@ -38,9 +48,9 @@
 (define (y2s-expr expr)
   (match expr
     ['true
-     (unsup 'true)]
+     'true]
     ['false
-     (unsup 'false)]
+     'false]
     ['true ; TODO: <symbol>
      (unsup 'true)]
     ['true ; TODO: <rational>
@@ -52,13 +62,13 @@
     ['true ; TODO: <hexa bv>
      (unsup 'true)]
     [(list 'forall var-decls expr)
-     (unsup 'forall)]
+     (list 'forall (y2s-var-decls var-decls) (y2s-expr expr))]
     [(list 'exists var-decls expr)
      (unsup 'exists)]
     [(list 'lambda var-decls expr)
      (unsup 'lambda)]
     [(list 'let bindings expr)
-     (unsup 'let)]
+     (list 'let (y2s-bindings bindings) (y2s-expr expr))]
     [(list 'update fcn locs val)
      (unsup 'update)]
     [(list-rest fcn-name fcn-args)
@@ -84,11 +94,11 @@
     [(list 'bitvector width)
      (list '_ 'BitVec width)]
     ['int
-     (unsup 'int)]
+     'Int]
     ['bool
-     (unsup 'bool)]
+     'Bool]
     ['real
-     (unsup 'real)]
+     'Real]
     [sym
      sym]))
 
@@ -114,8 +124,8 @@
     [(list sym ':: type)
      (list sym (y2s-type type))]))
 
-; <var_decl_list> ::= ( <var_decl> ... <var_decl> )
-(define (y2s-typed-var-list vars)
+; <var_decls> ::= ( <var_decl> ... <var_decl> )
+(define (y2s-var-decls vars)
   (map y2s-typed-var (split-chunks vars 3)))
 
 ; Convert a yices commmand to SMT-LIB
@@ -162,7 +172,7 @@
          ; Function definition
          [(list 'define sym ':: (list-rest '-> ret-type param-types)
                 (list 'lambda params body))
-          (list 'define-fun sym (y2s-typed-var-list params)
+          (list 'define-fun sym (y2s-var-decls params)
                 (y2s-type ret-type)
                 (y2s-expr body))
           ]
