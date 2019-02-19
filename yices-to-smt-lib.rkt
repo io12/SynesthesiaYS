@@ -3,7 +3,11 @@
 #lang racket
 
 (define (unsup sym)
-  (display (string-append "warning: " (symbol->string sym) " unsupported\n")))
+  (let ([msg (string-append "warning: "
+                            (symbol->string sym)
+                            " unsupported")])
+    (display (string-append msg "\n") (current-error-port))
+    (list 'echo msg)))
 
 (define (err-unrec e)
   (error "unrecognized" e))
@@ -167,6 +171,11 @@
   (match cmd
 	 [(list 'define-type sym typedef)
 	  (list 'define-sort sym '() (y2s-typedef typedef))]
+         ; Array declaration
+         [(list 'define sym ':: (list '-> param ret))
+          (list 'declare-const sym
+                (list 'Array (y2s-type param) (y2s-type ret)))]
+         ; Regular declaration
 	 [(list 'define sym ':: type)
 	  (list 'declare-const sym (y2s-type type))]
          ; Function definition
@@ -176,6 +185,7 @@
                 (y2s-type ret-type)
                 (y2s-expr body))
           ]
+         ; Regular definition
 	 [(list 'define sym ':: type expr)
 	  (list 'define-fun sym '() (y2s-type type) (y2s-expr expr))]
 	 [(list-rest 'assert expr rest)
@@ -231,6 +241,10 @@
          [bad
           (err-unrec bad)]))
 
+; Print output, using for-each so that the toplevel parens are not printed
+(define (print-out-prog prog)
+  (for-each (lambda (cmd) (pretty-write cmd out-port)) prog))
+
 ; Convert yices program to SMT-LIB
 (define (yices->smtlib yices-prog)
   (map y2s-cmd yices-prog))
@@ -262,4 +276,4 @@
 (define smtlib-prog (yices->smtlib yices-prog))
 
 ; Write output
-;(pretty-write smtlib-prog out-port)
+(print-out-prog smtlib-prog)
