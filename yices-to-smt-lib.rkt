@@ -12,8 +12,14 @@
   (match fcn-call
     [(list 'mk-bv width val)
      val]
-    [bad
-     (err-unrec bad)]))
+    [(list-rest 'bv-concat bvs)
+     (cons 'concat (map y2s-expr bvs))]
+    [(list 'ite cnd thn els)
+     (list 'ite (y2s-expr cnd) (y2s-expr thn) (y2s-expr els))]
+    [(list '= a b)
+     (list '= (y2s-expr a) (y2s-expr b))]
+    [(list-rest sym args)
+     (cons sym (map y2s-expr args))]))
 
 ; <expr> ::=
 ; true
@@ -55,8 +61,10 @@
      (unsup 'let)]
     [(list 'update fcn locs val)
      (unsup 'update)]
-    [fcn-call
-     (y2s-fcn fcn-call)]))
+    [(list-rest fcn-name fcn-args)
+     (y2s-fcn (cons fcn-name fcn-args))]
+    [sym
+     sym]))
 
 ; <type> ::=
 ; <symbol>
