@@ -2,8 +2,89 @@
 
 #lang racket
 
-(define (unsup-err sym)
+(define (err-unsup sym)
   (error sym "unsupported"))
+
+(define (err-unrec e)
+  (error "unrecognized" e))
+
+; <expr> ::=
+; true
+; | false
+; | <symbol>
+; | <rational>
+; | <float>
+; | <binary bv>
+; | <hexa bv>
+; | ( forall ( <var_decl> ... <var_decl> ) <expr> )
+; | ( exists ( <var_decl> ... <var_decl> ) <expr> )
+; | ( lambda ( <var_decl> ... <var_decl> ) <expr> )
+; | ( let ( <binding> ... <binding> ) <expr> )
+; | ( update <expr> ( <expr> ... <expr> ) <expr> )
+; | ( <function> <expr> ... <expr> )
+(define (y2s-expr expr)
+  (match expr
+    ['true
+     (err-unsup 'true)]
+    ['false
+     (err-unsup 'false)]
+    ['true ; TODO: <symbol>
+     (err-unsup 'true)]
+    ['true ; TODO: <rational>
+     (err-unsup 'true)]
+    ['true ; TODO: <float>
+     (err-unsup 'true)]
+    ['true ; TODO: <binary bv>
+     (err-unsup 'true)]
+    ['true ; TODO: <hexa bv>
+     (err-unsup 'true)]
+    [(list 'forall var-decls expr)
+     (err-unsup 'forall)]
+    [(list 'exists var-decls expr)
+     (err-unsup 'exists)]
+    [(list 'lambda var-decls expr)
+     (err-unsup 'lambda)]
+    [(list 'let bindings expr)
+     (err-unsup 'let)]
+    [(list 'update fcn locs val)
+     (err-unsup 'update)]
+    ['true ; TODO: function call
+     (err-unsup 'true)]))
+
+; <type> ::=
+; <symbol>
+; | ( tuple <type> ... <type> )
+; | ( -> <type> ... <type> <type> )
+; | ( bitvector <rational> )
+; | int
+; | bool
+; | real
+(define (y2s-type ty)
+  (match ty
+    [(list-rest 'tuple tys)
+     (err-unsup 'tuple)]
+    [(list-rest '-> tys)
+     (err-unsup '->)]
+    [(list 'bitvector width)
+     (err-unsup 'bitvector)]
+    ['int
+     (err-unsup 'int)]
+    ['bool
+     (err-unsup 'bool)]
+    ['real
+     (err-unsup 'real)]
+    [bad
+     (err-unrec bad)]))
+
+; <typedef> ::=
+; <type>
+; | ( scalar <symbol> ... <symbol> )
+(define (y2s-tydef tydef)
+  (match tydef
+    [(list-rest 'scalar syms)
+     (err-unsup 'scalar)]
+    [ty
+     (y2s-type ty)]))
 
 ; Convert a yices commmand to SMT-LIB
 ; <command> ::=
@@ -43,63 +124,63 @@
 (define (y2s-cmd cmd)
   (match cmd
 	 [(list 'define-type sym tydef)
-	  '(define-sort ,sym () ,(y2s-typedef tydef))]
+	  (list 'define-sort sym '() (y2s-tydef tydef))]
 	 [(list 'define sym ':: type)
-	  '(declare-const ,sym ,(y2s-type type))]
+	  (list 'declare-const sym (y2s-type type))]
 	 [(list 'define sym ':: type expr)
-	  '(define-fun ,sym () ,(y2s-type type) ,(y2s-expr expr))]
+	  (list 'define-fun sym '() (y2s-type type) (y2s-expr expr))]
 	 [(list-rest 'assert expr rest)
-	  '(assert ,(y2s-expr expr))]
+	  (list 'assert (y2s-expr expr))]
 	 [(list 'exit)
-	  '(exit)]
+	  (list 'exit)]
 	 [(list 'check)
-	  '(check-sat)]
+	  (list 'check-sat)]
 	 [(list 'check-assuming p)
-	  '(check-sat-assuming ,p)]
+	  (list 'check-sat-assuming p)]
 	 [(list 'push)
-	  '(push 1)]
+	  (list 'push 1)]
 	 [(list 'pop)
-	  '(pop 1)]
+	  (list 'pop 1)]
 	 [(list 'reset)
-	  '(reset-assertions)]
+	  (list 'reset-assertions)]
 	 [(list 'show-model)
-	  '(get-model)]
+	  (list 'get-model)]
 	 [(list 'eval expr)
-	  '(get-value ,(y2s-expr expr))]
+	  (list 'get-value (y2s-expr expr))]
 	 [(list 'echo str)
-	  '(echo ,str)]
+	  (list 'echo str)]
 	 [(list 'include str)
-	  (unsup-err 'include)]
+	  (err-unsup 'include)]
 	 [(list 'set-param sym val)
-	  (unsup-err 'set-param)]
+	  (err-unsup 'set-param)]
 	 [(list 'show-param sym)
-	  (unsup-err 'show-param)]
+	  (err-unsup 'show-param)]
 	 [(list 'show-params)
-	  (unsup-err 'show-params)]
+	  (err-unsup 'show-params)]
 	 [(list 'show-stats)
-	  (unsup-err 'show-stats)]
+	  (err-unsup 'show-stats)]
 	 [(list 'reset-stats)
-	  (unsup-err 'reset-stats)]
+	  (err-unsup 'reset-stats)]
 	 [(list 'set-timeout num)
-	  (unsup-err 'set-timeout)]
+	  (err-unsup 'set-timeout)]
 	 [(list 'show-timeout num)
-	  (unsup-err 'show-timeout)]
+	  (err-unsup 'show-timeout)]
 	 [(list 'dump-context)
-	  (unsup-err 'dump-context)]
+	  (err-unsup 'dump-context)]
 	 [(list-rest 'help rest)
-	  (unsup-err 'help)]
+	  (err-unsup 'help)]
 	 [(list 'ef-solve)
-	  '(check-sat)]
+	  (list 'check-sat)]
 	 [(list-rest 'export-to-dimacs rest)
-	  (unsup-err 'export-to-dimacs)]
+	  (err-unsup 'export-to-dimacs)]
 	 [(list 'show-implicant)
-	  '(get-model)]
+	  (list 'get-model)]
 	 [(list 'show-unsat-core)
-	  '(get-unsat-core)]
+	  (list 'get-unsat-core)]
 	 [(list 'show-unsat-assumptions)
-	  '(get-unsat-assumptions)]
+	  (list 'get-unsat-assumptions)]
          [bad
-          (error "unrecognized" bad)]))
+          (err-unrec bad)]))
 
 ; Convert yices program to SMT-LIB
 (define (yices->smtlib yices-prog)
