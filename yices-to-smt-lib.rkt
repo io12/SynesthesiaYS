@@ -27,6 +27,8 @@
      (cons 'concat (map y2s-expr bvs))]
     [(list-rest 'bv-add bvs)
      (cons 'bvadd (map y2s-expr bvs))]
+    [(list 'bv-extract hi lo bv)
+     (list (list '_ 'extract hi lo) bv)]
     [(list 'ite cnd thn els)
      (list 'ite (y2s-expr cnd) (y2s-expr thn) (y2s-expr els))]
     [(list '= a b)
