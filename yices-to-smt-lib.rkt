@@ -199,10 +199,10 @@
 	 [(list 'define sym ':: type)
 	  (list 'declare-const sym (y2s-type type))]
          ; Function definition
-         [(list 'define sym ':: (list-rest '-> ret-type param-types)
+         [(list 'define sym ':: (list-rest '-> types)
                 (list 'lambda params body))
           (list 'define-fun sym (y2s-var-decls params)
-                (y2s-type ret-type)
+                (y2s-type (last types)) ; Return type
                 (y2s-expr body))
           ]
          ; Regular definition
