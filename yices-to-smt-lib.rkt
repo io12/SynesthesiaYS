@@ -6,16 +6,23 @@
   (let ([msg (string-append "warning: "
                             (symbol->string sym)
                             " unsupported")])
-    (display (string-append msg "\n") (current-error-port))
+    (displayln msg (current-error-port))
     (list 'echo msg)))
 
 (define (err-unrec e)
   (error "unrecognized" e))
 
+(define (y2s-bitvec-val width val)
+  (string->symbol
+   (string-append "#b"
+                  (~r val
+                      #:base 2
+                      #:min-width width #:pad-string "0"))))
+
 (define (y2s-fcn fcn-call)
   (match fcn-call
     [(list 'mk-bv width val)
-     val]
+     (y2s-bitvec-val width val)]
     [(list-rest 'bv-concat bvs)
      (cons 'concat (map y2s-expr bvs))]
     [(list 'ite cnd thn els)
@@ -241,9 +248,14 @@
          [bad
           (err-unrec bad)]))
 
-; Print output, using for-each so that the toplevel parens are not printed
+; Print output
+; Use for-each so that the toplevel parens are not printed
+; Remove pipes to fix bitvector literals
 (define (print-out-prog prog)
-  (for-each (lambda (cmd) (pretty-write cmd out-port)) prog))
+  (for-each
+   (lambda (cmd)
+     (string-replace (pretty-format cmd) "|" ""))
+   prog))
 
 ; Convert yices program to SMT-LIB
 (define (yices->smtlib yices-prog)
