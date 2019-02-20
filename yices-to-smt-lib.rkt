@@ -27,12 +27,39 @@
      (cons 'concat (map y2s-expr bvs))]
     [(list-rest 'bv-add bvs)
      (cons 'bvadd (map y2s-expr bvs))]
+    [(list-rest 'bv-sub bvs)
+     (cons 'bvsub (map y2s-expr bvs))]
+    [(list-rest 'bv-shl bvs)
+     (cons 'bvshl (map y2s-expr bvs))]
+    [(list-rest 'bv-lshr bvs)
+     (cons 'bvlshr (map y2s-expr bvs))]
+    [(list-rest 'bv-ashr bvs)
+     (cons 'bvashr (map y2s-expr bvs))]
+    [(list-rest 'bv-xor bvs)
+     (cons 'bvxor (map y2s-expr bvs))]
+    [(list-rest 'bv-or bvs)
+     (cons 'bvor (map y2s-expr bvs))]
+    [(list-rest 'bv-and bvs)
+     (cons 'bvand (map y2s-expr bvs))]
+    [(list 'bv-not bv)
+     (list 'bvnot (y2s-expr bv))]
+    [(list 'bv-lt bv1 bv2)
+     (list 'bvult (y2s-expr bv1) (y2s-expr bv2))]
+    [(list 'bv-slt bv1 bv2)
+     (list 'bvslt (y2s-expr bv1) (y2s-expr bv2))]
     [(list 'bv-extract hi lo bv)
-     (list (list '_ 'extract hi lo) bv)]
+     (list (list '_ 'extract (y2s-expr hi) (y2s-expr lo))
+           (y2s-expr bv))]
+    [(list 'bv-zero-extend bv k)
+     (list (list '_ 'zero_extend (y2s-expr k)) (y2s-expr bv))]
+    [(list 'bv-sign-extend bv k)
+     (list (list '_ 'sign_extend (y2s-expr k)) (y2s-expr bv))]
     [(list 'ite cnd thn els)
      (list 'ite (y2s-expr cnd) (y2s-expr thn) (y2s-expr els))]
     [(list '= a b)
      (list '= (y2s-expr a) (y2s-expr b))]
+    [(list '/= a b)
+     (list 'not (list '= (y2s-expr a) (y2s-expr b)))]
     [(list-rest sym args)
      (cons sym (map y2s-expr args))]))
 
