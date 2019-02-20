@@ -25,6 +25,8 @@
      (y2s-bitvec-val width val)]
     [(list-rest 'bv-concat bvs)
      (cons 'concat (map y2s-expr bvs))]
+    [(list-rest 'bv-add bvs)
+     (cons 'bvadd (map y2s-expr bvs))]
     [(list 'ite cnd thn els)
      (list 'ite (y2s-expr cnd) (y2s-expr thn) (y2s-expr els))]
     [(list '= a b)
@@ -41,6 +43,17 @@
 ; <bindings> ::= ( <binding> ... <binding> )
 (define (y2s-bindings bindings)
   (map y2s-binding bindings))
+
+
+; Change 0xab to #xab
+(define (fix-num-sym sym)
+  (if (symbol? sym)
+      (let ([s (symbol->string sym)])
+        (string->symbol
+         (if (char=? (string-ref s 0) #\0)
+             (string-append "#" (substring s 1))
+             s)))
+      sym))
 
 ; <expr> ::=
 ; true
@@ -85,7 +98,7 @@
     [(list-rest fcn-name fcn-args)
      (y2s-fcn (cons fcn-name fcn-args))]
     [sym
-     sym]))
+     (fix-num-sym sym)]))
 
 ; <type> ::=
 ; <symbol>
@@ -254,7 +267,9 @@
 (define (print-out-prog prog)
   (for-each
    (lambda (cmd)
-     (string-replace (pretty-format cmd) "|" ""))
+     (displayln (string-replace
+                 (pretty-format cmd #:mode 'write)
+                 "|" "") out-port))
    prog))
 
 ; Convert yices program to SMT-LIB
